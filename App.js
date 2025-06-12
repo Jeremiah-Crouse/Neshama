@@ -54,7 +54,7 @@ function getWordsFromStack() {
 }
 
 bot.on('message', async msg => {
-  if (msg.text && msg.text.toLowerCase().startsWith("/angel")) {
+  if (msg.text)) {
     if (quantumStack.length < 24) await refillQuantumStack();
     const hebWords = getWordsFromStack();
     if (!hebWords.length) return bot.sendMessage(msg.chat.id, "No words generated.");
