@@ -1,0 +1,14 @@
+{
+  "name": "angelbot",
+  "version": "1.0.0",
+  "description": "Telegram bot that delivers quantum-random gematria words and Google Translate responses",
+  "main": "App.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node App.js"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.61.0",
+    "node-fetch": "^2.6.7"
+  }
+}

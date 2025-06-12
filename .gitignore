@@ -1,0 +1,27 @@
+# Node dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Dotenv/local secrets
+.env
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Temporary data/log files
+*.log
+
+# Bot caches/db files, lock files
+.cache/
+*.sqlite
+*.dv
+
+# Secrets
+apikeys.json
+secret*.*
+
+# Project-specific
+*.pid
+*.swp
