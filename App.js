@@ -1,3 +1,5 @@
+console.log("Neshama AngelBot is RUNNING and awaiting messages!");
+
 const TelegramBot = require('node-telegram-bot-api');
 const fetch = require('node-fetch');
 const fs = require('fs');
