@@ -62,11 +62,7 @@ async function googleTranslate(text) {
 }
 
 // Telegram Bot
-const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
-
-bot.on('message', (msg) => {
-  console.log("DEBUG CHAT ID >>>", msg.chat.id, "| message:", msg.text);
-});
+const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: false });
 
 
 async function quantumPause() {
