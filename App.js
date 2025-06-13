@@ -1,3 +1,7 @@
+bot.on('message', (msg) => {
+  console.log("DEBUG CHAT ID >>>", msg.chat.id, "| message:", msg.text);
+});
+
 const TelegramBot = require('node-telegram-bot-api');
 const fetch = require('node-fetch');
 const fs = require('fs');
