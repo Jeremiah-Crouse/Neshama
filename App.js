@@ -1,7 +1,3 @@
-bot.on('message', (msg) => {
-  console.log("DEBUG CHAT ID >>>", msg.chat.id, "| message:", msg.text);
-});
-
 const TelegramBot = require('node-telegram-bot-api');
 const fetch = require('node-fetch');
 const fs = require('fs');
@@ -65,6 +61,11 @@ async function googleTranslate(text) {
 
 // Telegram Bot
 const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: false });
+
+bot.on('message', (msg) => {
+  console.log("DEBUG CHAT ID >>>", msg.chat.id, "| message:", msg.text);
+});
+
 
 async function quantumPause() {
   if (quantumStack.length === 0) await refillQuantumStack();
