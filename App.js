@@ -68,6 +68,8 @@ bot.on('message', (msg) => {
   console.log("DEBUG CHAT ID >>>", msg.chat.id, "| message:", msg.text);
 });
 
+console.log("I am here");
+
 
 async function quantumPause() {
   if (quantumStack.length === 0) await refillQuantumStack();
