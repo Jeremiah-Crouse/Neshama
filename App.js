@@ -57,7 +57,7 @@ bot.on('message', async msg => {
 
   // Quantum-driven 33.33% chance to reply
   const decisionNum = quantumStack.shift();
-  if (decisionNum > (65536 / 4)) return;
+  if (decisionNum > (65536 / 3)) return;
 
   // Get # of words via digitalRoot; build word list
   const n_raw = quantumStack.shift() || 1;
