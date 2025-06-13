@@ -1,4 +1,4 @@
-console.log("Neshama AngelBot is RUNNING and awaiting messages!");
+
 
 const TelegramBot = require('node-telegram-bot-api');
 const fetch = require('node-fetch');
@@ -62,13 +62,11 @@ async function googleTranslate(text) {
 }
 
 // Telegram Bot
-const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: false });
+const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
 
 bot.on('message', (msg) => {
   console.log("DEBUG CHAT ID >>>", msg.chat.id, "| message:", msg.text);
 });
-
-console.log("I am here");
 
 
 async function quantumPause() {
