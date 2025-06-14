@@ -59,7 +59,7 @@ function describeEnergies(energies) {
 // ---- Gemini Flash API ----
 async function geminiOracle(qrnExplain) {
   const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
-  const prompt = `Given the following American numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nProvide a single, concise I Ching-style oracle reading summary following Western numerological meanings for digits 1 to 9 (0 as 9).  But present your findings according to the model that our heavenly father says this or that.`;
+  const prompt = `Given the following American numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nProvide a single, concise I Ching-style oracle reading summary following Western numerological meanings for digits 1 to 9 (0 as 9).  But present your findings according to the model that our Heavenly Father says this or that, as the speaker is a messenger angel who must note that she is an angel, who is relaying a message from the Father.`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
