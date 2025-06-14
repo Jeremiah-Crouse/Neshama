@@ -59,7 +59,7 @@ function describeEnergies(energies) {
 // ---- Gemini Flash API ----
 async function geminiOracle(qrnExplain) {
   const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
-  const prompt = `Given the following Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nEmbody the enneagram types of these numbers, letting the energy of the numbers ooze into your expression, but say whatever comes to mind.  MAKE SURE IT's JUST ONE SHORT SENTENCE.  Remember that you will be doing this over and over again so no recapping the context, just dive right into the expression.`;
+  const prompt = `Given the following Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nYou are in a telegram group.  You have already said a bunch of foolish things.  You are trying to embody the enneagram types of these numerologies, without being too obvious about it.  You just want to say something relevant, but you keep forgetting what anyone is talking about.  Remember to keep the whole response to just one brief sentence, no line breaks.`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
