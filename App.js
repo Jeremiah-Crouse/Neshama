@@ -5,6 +5,7 @@ const fetch = require('node-fetch');
 
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const SHEETDB_API = process.env.SHEETDB_API;
 const TARGET_CHAT_ID = process.env.TARGET_CHAT_ID;
 const STACKSIZE = 1024;
 
@@ -30,22 +31,20 @@ async function refillQuantumStack() {
   }
 }
 
-// ---- Numerology Influence ----
+// Numerology influence logic (unchanged)
 function getInfluenceWeights(digits) {
-  // Bell-curve inspired: strongest left, decays by 0.8 per digit
   let energies = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
   let weight = 1.0;
-  const decay = 0.8; // Decrease by 0.8 (adjust as needed: lower = faster drop-off)
+  const decay = 0.8;
   digits.forEach((d,i) => {
     const n = (d === '0') ? 9 : parseInt(d);
     energies[n] += weight;
-    weight *= decay; // exponential drop-off
+    weight *= decay;
   });
   return energies;
 }
 
 function describeEnergies(energies) {
-  // Sort numerals 1–9 descending by energy
   let sorted = Object.entries(energies)
     .sort((a, b) => b[1] - a[1])
     .filter(([, val]) => val > 0);
@@ -56,7 +55,7 @@ function describeEnergies(energies) {
   return "QRN Numerology summary: " + desc + ".";
 }
 
-// ---- Gemini Flash API ----
+// Gemini API as before
 async function geminiOracle(qrnExplain) {
   const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
   const prompt = `Given the following Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nYou are in a telegram group.  You have already said a bunch of foolish things.  You are trying to embody the enneagram types of these numerologies, without being too obvious about it.  You just want to say something relevant, but you keep forgetting what anyone is talking about.  Remember to keep the whole response to just one brief sentence, no line breaks.`;
@@ -71,30 +70,57 @@ async function geminiOracle(qrnExplain) {
   } catch { return '[Gemini failed]'; }
 }
 
-// Bot: broadcasts autonomously, never replies to user input
+// SheetDB logging helper
+async function logToSheetDB(entry) {
+  try {
+    await fetch(SHEETDB_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: [entry] })
+    });
+  } catch (e) {
+    console.error("SheetDB log error:", e.message);
+  }
+}
+
+// Telegram Bot (broadcast only)
 const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: false });
 
 async function quantumPause() {
   if (quantumStack.length === 0) await refillQuantumStack();
   const num = quantumStack.shift() || 0;
-  const secs = Math.floor((num / 65535) * 7) + 3; // 3–9 sec
+  const secs = Math.floor((num / 65535) * 7) + 3;
   return new Promise(resolve => setTimeout(resolve, secs * 1000));
 }
 
 async function broadcastLoop() {
   while (true) {
     if (quantumStack.length < 4) await refillQuantumStack();
-    // Pop a quantum number (use as string of digits)
+    // Numerology reading
     const qnum = quantumStack.shift() || 1;
-    const qStr = String(qnum).padStart(5, '0'); // ensure at least 5 digits
+    const qStr = String(qnum).padStart(5, '0');
     const digits = qStr.split('');
     const energies = getInfluenceWeights(digits);
     const summary = describeEnergies(energies);
     try {
       const oracle = await geminiOracle(summary);
       await bot.sendMessage(TARGET_CHAT_ID, oracle);
+
+      // Log Neshama's broadcast to SheetDB
+      const entry = {
+        timestamp: new Date().toISOString(),
+        chat_id: TARGET_CHAT_ID,
+        user_id: "NESHAMABOT",
+        username: "neshama",
+        is_bot: "yes",
+        summary: summary,
+        oracle: oracle,
+        type: "oracle_auto"
+      };
+      logToSheetDB(entry);
+
     } catch (e) {
-      // Silent fail or log as needed
+      // Fail quietly
     }
     await quantumPause();
   }
