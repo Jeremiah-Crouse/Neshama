@@ -59,7 +59,7 @@ function describeEnergies(energies) {
 // ---- Gemini Flash API ----
 async function geminiOracle(qrnExplain) {
   const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
-  const prompt = `Given the following Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nYou have a short attention span.  Embody the enneagram types of these numbers, letting the energy of the numbers ooze into your expression, but say whatever comes to mind.`;
+  const prompt = `Given the following Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nEmbody the enneagram types of these numbers, letting the energy of the numbers ooze into your expression, but say whatever comes to mind.`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
