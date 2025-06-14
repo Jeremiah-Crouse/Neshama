@@ -1,106 +1,103 @@
-
-
+const express = require('express');
+const path = require('path');
 const TelegramBot = require('node-telegram-bot-api');
 const fetch = require('node-fetch');
-const fs = require('fs');
 
-// ----------- CONFIGURATION -----------
-const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN; // Set in Render
-const TARGET_CHAT_ID = process.env.TARGET_CHAT_ID; // Set the chat (use @mygroup or a test chat id)
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY; // Set in Render
+const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const TARGET_CHAT_ID = process.env.TARGET_CHAT_ID;
 const STACKSIZE = 1024;
 
-const gematriaJSON = require('./gematria_words.json');
+const app = express();
+const PORT = process.env.PORT || 3000;
+app.get('/', (_, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+app.listen(PORT, () => {
+  console.log(`Web server running on port ${PORT}`);
+});
 
 let quantumStack = [];
 async function refillQuantumStack() {
   try {
-    let res = await fetch(`https://qrng.anu.edu.au/API/jsonI.php?length=${STACKSIZE}&type=uint16`);
+    let res = await fetch(
+      `https://qrng.anu.edu.au/API/jsonI.php?length=${STACKSIZE}&type=uint16`
+    );
     let data = await res.json();
     if (data.success) quantumStack = quantumStack.concat(data.data);
-  } catch {
-    // Ignore fetch errors, will try again soon.
+  } catch (e) {
+    console.error("Error refilling quantum stack:", e);
   }
 }
 
-// Pythagorean digital root (sum digits to 1-9)
-function digitalRoot(num) {
-  let n = Math.abs(num) % 65535;
-  while (n > 9) n = String(n).split('').reduce((sum, d) => sum+parseInt(d),0);
-  return n || 1;
+// ---- Numerology Influence ----
+function getInfluenceWeights(digits) {
+  // Bell-curve inspired: strongest left, decays by 0.8 per digit
+  let energies = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+  let weight = 1.0;
+  const decay = 0.8; // Decrease by 0.8 (adjust as needed: lower = faster drop-off)
+  digits.forEach((d,i) => {
+    const n = (d === '0') ? 9 : parseInt(d);
+    energies[n] += weight;
+    weight *= decay; // exponential drop-off
+  });
+  return energies;
 }
 
-// Generate quantum gematria sentence
-function getWordsFromStack() {
-  if (quantumStack.length < 24) refillQuantumStack();
-  const n_raw = quantumStack.shift() || 1;
-  const N = digitalRoot(n_raw);
-  let words = [];
-  const keys = Object.keys(gematriaJSON);
-  for (let i = 0; i < N; i++) {
-    if (quantumStack.length < 2) refillQuantumStack();
-    const idxA = quantumStack.shift() || 0;
-    const idxB = quantumStack.shift() || 0;
-    const key = keys[Math.floor(idxA / 65535 * keys.length)];
-    const candidates = gematriaJSON[key] || [];
-    if (!candidates.length) continue;
-    const word = candidates[Math.floor(idxB / 65535 * candidates.length)];
-    words.push(word);
-  }
-  return words;
+function describeEnergies(energies) {
+  // Sort numerals 1–9 descending by energy
+  let sorted = Object.entries(energies)
+    .sort((a, b) => b[1] - a[1])
+    .filter(([, val]) => val > 0);
+  if (!sorted.length) return "No numerological energies present.";
+  let desc = sorted.map(([num, val], idx) =>
+    `${idx === 0 ? "Dominant" : idx === 1 ? "then" : "followed by"} ${num}-energy (${val.toFixed(2)})`
+  ).join(", ");
+  return "QRN Numerology summary: " + desc + ".";
 }
 
-// Google Translate
-async function googleTranslate(text) {
-  let resp = await fetch(
-    `https://translation.googleapis.com/language/translate/v2?key=${GOOGLE_API_KEY}`,
-    { method: 'POST', body: JSON.stringify({ q: text, source: 'iw', target: 'en', format: 'text' }),
-      headers: {'Content-Type': 'application/json'}}
-  );
-  let data = await resp.json();
-  return data.data.translations[0].translatedText || '[no translation]';
+// ---- Gemini Flash API ----
+async function geminiOracle(qrnExplain) {
+  const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
+  const prompt = `Given the following American numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nProvide a single, concise I Ching-style oracle reading summary following Western numerological meanings for digits 1 to 9 (0 as 9).`;
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+  });
+  const data = await response.json();
+  try {
+    return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '[Gemini failed]';
+  } catch { return '[Gemini failed]'; }
 }
 
-// Telegram Bot
+// Bot: broadcasts autonomously, never replies to user input
 const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: false });
-
 
 async function quantumPause() {
   if (quantumStack.length === 0) await refillQuantumStack();
-  const num = quantumStack.shift();
-  // Scale to 0–3 seconds (can switch to 1–3 for never-instant)
-  const secs = Math.floor((num / 65535) * 4); // 0, 1, 2, 3
+  const num = quantumStack.shift() || 0;
+  const secs = Math.floor((num / 65535) * 7) + 3; // 3–9 sec
   return new Promise(resolve => setTimeout(resolve, secs * 1000));
 }
 
-// Main loop: auto-sends message forever (no user input needed)
 async function broadcastLoop() {
   while (true) {
-    if (quantumStack.length < 24) await refillQuantumStack();
-    // Generate the quantum sentence
-    const words = getWordsFromStack();
-    if (words.length) {
-      const hebString = words.join(' ');
-      try {
-        const translation = await googleTranslate(hebString);
-        await bot.sendMessage(TARGET_CHAT_ID, translation);
-      } catch (e) {
-        // fail quietly
-      }
+    if (quantumStack.length < 4) await refillQuantumStack();
+    // Pop a quantum number (use as string of digits)
+    const qnum = quantumStack.shift() || 1;
+    const qStr = String(qnum).padStart(5, '0'); // ensure at least 5 digits
+    const digits = qStr.split('');
+    const energies = getInfluenceWeights(digits);
+    const summary = describeEnergies(energies);
+    try {
+      const oracle = await geminiOracle(summary);
+      await bot.sendMessage(TARGET_CHAT_ID, oracle);
+    } catch (e) {
+      // Silent fail or log as needed
     }
-    // Random (QRN) pause between 0–3 seconds
     await quantumPause();
   }
 }
 
-// Web server for Render health check
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
-app.get('/', (_, res) => {
-  res.send(`<h2>Neshama/SpiritDevilbot broadcasting automatically!</h2>`);
-});
-app.listen(PORT, () => console.log(`Web server on port ${PORT}`));
-
-// Start up!
 refillQuantumStack().then(broadcastLoop);
