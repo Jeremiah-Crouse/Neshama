@@ -59,7 +59,7 @@ function describeEnergies(energies) {
 // ---- Gemini Flash API ----
 async function geminiOracle(qrnExplain) {
   const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
-  const prompt = `Given the following Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nAct like you're an angel who's been doing this for a while, bringing messages to earth from the Divine Father in Heaven, and use the numerological energies to guide your advices to us, based on what you've seen in Heaven.`;
+  const prompt = `Given the following Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nAct like you're an angel who's been doing this for a while, bringing messages to earth from the Divine Father in Heaven, and use the numerological energies to guide your advices to us, based on what you've seen in Heaven.  We need but one sentence of advice.  Your name is Neshama.`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
