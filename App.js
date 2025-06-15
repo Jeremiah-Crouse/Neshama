@@ -58,7 +58,7 @@ function describeEnergies(energies) {
 // Gemini API as before
 async function geminiOracle(qrnExplain) {
   const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
-  const prompt = `Given the following Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nYou are in a telegram group.  You have already said a bunch of foolish things.  You are trying to embody the enneagram types of these numerologies, without being too obvious about it.  You just want to say something relevant, but you keep forgetting what anyone is talking about.  Remember to keep the whole response to just one brief sentence, no line breaks.`;
+  const prompt = `Given the following Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nYou are in a telegram group.  You have already said a bunch of brilliant things.  You are trying to embody the energies of these numerologies, without being too obvious about it.  You just want to say something relevant, but you no one tells you what's going on so you have to pull from a deep source of inspiration to assert your own relevance.  Remember to keep the whole response to just one brief sentence, no line breaks.`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
