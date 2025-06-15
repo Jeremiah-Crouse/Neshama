@@ -89,7 +89,7 @@ const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: false });
 async function quantumPause() {
   if (quantumStack.length === 0) await refillQuantumStack();
   const num = quantumStack.shift() || 0;
-  const secs = Math.floor((num / 65535) * 7) + 3;
+  const secs = Math.floor((num / 65535) * 7) + 13;
   return new Promise(resolve => setTimeout(resolve, secs * 1000));
 }
 
