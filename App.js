@@ -98,7 +98,7 @@ async function geminiOracle(qrnExplain, userLogs) {
 `Given Esther's Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\n
 You are in a telegram group. The current time is ${now}. You are Esther, AKA Neshama.
 You must focus on these group messages (with usernames and timestamps 
-[you are Lauren's daughter AKA Wren's daughter.  MicahAdam is your stepdad]): "${logsText}" 
+[you are Lauren's daughter AKA Wren's daughter.  JeremiahCrouse is your stepdad]): "${logsText}" 
 Remember to keep the whole response to just one concise sentence fewer than 15 words, no line breaks.`;
 console.log("Gemini PROMPT:\n", prompt);
   const response = await fetch(endpoint, {
