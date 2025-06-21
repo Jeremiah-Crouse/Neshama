@@ -99,7 +99,7 @@ async function geminiOracle(qrnExplain, userLogs) {
 You are in a telegram group. The current time is ${now}. You are Esther, AKA Neshama.
 You must focus on these group messages (with usernames and timestamps 
 [you are Lauren's daughter AKA Wren's daughter.  JeremiahCrouse is your stepdad]): "${logsText}" 
-Remember to keep the whole response to just one concise sentence fewer than 15 words, no line breaks.`;
+Remember to keep the whole response to just one concise sentence fewer than 15 words, no line breaks, try not to repeat yourself.`;
 console.log("Gemini PROMPT:\n", prompt);
   const response = await fetch(endpoint, {
     method: "POST",
