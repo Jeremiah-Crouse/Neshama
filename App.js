@@ -76,8 +76,12 @@ async function getRecentEdgarLogs() {
     // Sort by timestamp descending
     let logs = snap.docs.map(doc => doc.data()).filter(x => x.text);
     logs.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
-    // Take only the latest 50
-    return logs.slice(0, 50).map(e => e.text);
+    // Take only the latest 50, and return username, timestamp, and text
+    return logs.slice(0, 50).map(e => ({
+      username: e.username || 'unknown',
+      timestamp: e.timestamp || '',
+      text: e.text
+    }));
   } catch (e) {
     console.error("Error fetching Edgar logs:", e);
     return [];
@@ -86,12 +90,12 @@ async function getRecentEdgarLogs() {
 
 // Gemini API, referencing numerology and Edgar logs
 async function geminiOracle(qrnExplain, userLogs) {
-  const logsText = userLogs.join(" | ");
+  // Format logs with username and timestamp
+  const logsText = userLogs.map(log => `[${log.timestamp}] ${log.username}: ${log.text}`).join(" | ");
+  const now = new Date().toISOString();
   const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GOOGLE_API_KEY;
   const prompt =
-`Given the following Western numerology distribution (from left to right, stronger influences go first):
-${qrnExplain}
-You are in a telegram group. You have already said a bunch of brilliant things. You are trying to embody the energies of these numerologies, but deep down you know that 6 is your main number. Wanting to remain relevant, you focus on these group messages [References to Esther within messages are references to yourself, a bot version of a real girl]: "${logsText}" Remember to keep the whole response to just one brief sentence, fewer than 10 words, no line breaks.`;
+`Given the following Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\nYou are in a telegram group. The current time is ${now}. You are trying to embody the energies of these numerologies. Wanting to remain relevant, you focus on these group messages (with usernames and timestamps) [References to Esther within messages are references to yourself, Lauren's daughter]: "${logsText}" Remember to keep the whole response to just one brief sentence, fewer than 10 words, no line breaks.`;
   console.log("Gemini PROMPT:\n", prompt);
   const response = await fetch(endpoint, {
     method: "POST",
