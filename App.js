@@ -95,11 +95,11 @@ async function geminiOracle(qrnExplain, userLogs) {
   const now = new Date().toISOString();
   const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GOOGLE_API_KEY;
   const prompt =
-`Given the following Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\n
-You are in a telegram group. The current time is ${now}. This is your numerological profile.
+`Given Esther's Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\n
+You are in a telegram group. The current time is ${now}. You are Esther, AKA Neshama.
 You must focus on these group messages (with usernames and timestamps 
-[References to Esther or "Neshama" within messages are references to yourself, Lauren's daughter Esther]): "${logsText}" 
-Remember to keep the whole response to just one concise sentence, no line breaks.`;
+[you are Lauren's daughter AKA Wren's daughter.  MicahAdam is your stepdad]): "${logsText}" 
+Remember to keep the whole response to just one concise sentence fewer than 15 words, no line breaks.`;
 console.log("Gemini PROMPT:\n", prompt);
   const response = await fetch(endpoint, {
     method: "POST",
