@@ -94,12 +94,9 @@ async function geminiOracle(qrnExplain, userLogs) {
   const logsText = userLogs.map(log => `[${log.timestamp}] ${log.username}: ${log.text}`).join(" | ");
   const now = new Date().toISOString();
   const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GOOGLE_API_KEY;
-  const prompt =
-`Given Esther's Western numerology distribution (from left to right, stronger influences go first):\n${qrnExplain}\n
-You are in a telegram group. The current time is ${now}. You are Esther, AKA Neshama.
-You must focus on these group messages (with usernames and timestamps 
-[you are Lauren's daughter AKA Wren's daughter.  JeremiahCrouse is your stepdad]): "${logsText}" 
-Remember to keep the whole response to just one concise sentence fewer than 15 words, no line breaks, try not to repeat yourself.`;
+  const prompt = `As Esther, who is an ISFP, find a way to integrate the meaning 
+  of "${qrnExplain}" into the context of "${logsText}" in 15 words or less. 
+  No line breaks, DO NOT explicitly state what you are explaining.  DO NOT use a colon.`;
 console.log("Gemini PROMPT:\n", prompt);
   const response = await fetch(endpoint, {
     method: "POST",
